@@ -27,12 +27,8 @@ curl -I http://10.10.10.100:8090     # expect 200 OK
 ```
 
 Host port is **8090** (3000 was already in use on the server). If 8090 is
-also taken, pick another without editing tracked files:
-
-```bash
-echo "HOST_PORT=8095" > .env     # .env is gitignored; compose reads it
-docker compose up -d
-```
+also taken, change `"8090:3000"` in [`docker-compose.yml`](../docker-compose.yml)
+to a free port and re-run `docker compose up -d`.
 
 Then give your admin **`10.10.10.100:8090`** + a hostname (e.g.
 `http://growth.internal`) to point at it.
