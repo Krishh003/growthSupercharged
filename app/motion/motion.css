@@ -1,0 +1,1571 @@
+/* Motion kit — Figma Smart-Animate hover interactions as live CSS.
+   Every element animates its rest -> hover state on :hover / :focus-within.
+   All classes are namespaced `mk-` and tokens are scoped to `.mk`. */
+
+.mk {
+  --mk-blue: #005fff;
+  --mk-blue-deep: #0040c8;
+  --mk-blue-soft: #e8f0ff;
+  --mk-green: #26b953;
+  --mk-green-deep: #1c9a42;
+  --mk-green-soft: #e7f7ec;
+  --mk-ink: #0f1115;
+  --mk-muted: #6b7280;
+  --mk-faint: #9aa1ab;
+  --mk-line: #e7e9ee;
+  --mk-card: #ffffff;
+  --mk-bg: #f5f6f8;
+  --mk-r: 18px;
+  --mk-r-sm: 12px;
+  --mk-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --mk-dur: 0.5s;
+  --mk-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 6px rgba(16, 24, 40, 0.06);
+  --mk-shadow-lg: 0 22px 48px -14px rgba(16, 24, 40, 0.24);
+
+  font-family: var(--font-dm), system-ui, -apple-system, sans-serif;
+  color: var(--mk-ink);
+}
+
+/* ---------- showcase scaffolding ---------- */
+.mk-page {
+  background: var(--mk-bg);
+  min-height: 100vh;
+  padding: 56px 28px 140px;
+}
+.mk-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.mk-masthead {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+}
+.mk-masthead h1 {
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+.mk-masthead p {
+  margin-top: 12px;
+  max-width: 640px;
+  color: var(--mk-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.mk-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--mk-blue-soft);
+  color: var(--mk-blue);
+  font-size: 13px;
+  font-weight: 600;
+}
+.mk-hint span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mk-blue);
+  animation: mk-pulse 1.6s var(--mk-ease) infinite;
+}
+@keyframes mk-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.4; }
+}
+.mk-section {
+  margin-top: 64px;
+}
+.mk-section__head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--mk-line);
+}
+.mk-section__head h2 {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.mk-section__head em {
+  font-style: normal;
+  font-size: 13px;
+  color: var(--mk-faint);
+}
+.mk-grid {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+.mk-grid--2 { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+.mk-grid--wide { grid-template-columns: 1fr; }
+
+/* ---------- shared bits ---------- */
+.mk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px 20px;
+  border-radius: 10px;
+  border: 0;
+  cursor: pointer;
+  transition: transform 0.3s var(--mk-ease), box-shadow 0.3s var(--mk-ease),
+    background-color 0.3s var(--mk-ease), color 0.3s var(--mk-ease);
+}
+.mk-btn svg { transition: transform 0.3s var(--mk-ease); }
+.mk-btn:hover svg { transform: translateX(3px); }
+.mk-btn--blue { background: var(--mk-blue); color: #fff; }
+.mk-btn--blue:hover { box-shadow: 0 10px 22px -8px rgba(0, 95, 255, 0.6); transform: translateY(-1px); }
+.mk-btn--white { background: #fff; color: var(--mk-blue); }
+.mk-btn--white:hover { transform: translateY(-1px); box-shadow: 0 12px 26px -10px rgba(0, 0, 0, 0.35); }
+.mk-btn--ghost { background: transparent; color: var(--mk-ink); border: 1px solid var(--mk-line); }
+.mk-btn--ghost:hover { border-color: var(--mk-blue); color: var(--mk-blue); }
+
+.mk-chip {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--tone-soft, var(--mk-blue-soft));
+  color: var(--tone, var(--mk-blue));
+  transition: background-color var(--mk-dur) var(--mk-ease),
+    color var(--mk-dur) var(--mk-ease);
+}
+
+/* ---------- 1. Hero block — drifting gradient blob + heading colorize ---------- */
+.mk-hero {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  border-radius: 24px;
+  padding: 46px 44px 48px;
+  box-shadow: var(--mk-shadow);
+  isolation: isolate;
+}
+/* two soft blue highlights behind the hero, drifting on a slow ambient loop */
+.mk-hero__blob {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+  transition: opacity 0.6s var(--mk-ease);
+  /* highlight A — upper-left, behind the tag */
+  width: 360px;
+  height: 360px;
+  top: -60px;
+  left: -50px;
+  opacity: 0.55;
+  background: radial-gradient(circle at 50% 50%, #6ea8ff, rgba(110, 168, 255, 0) 66%);
+  /* linear keeps the drift continuously moving — an eased loop slows to a near
+     stop at every keyframe, which reads as "frozen". transform/opacity only, so
+     it stays on the compositor. */
+  will-change: transform;
+  animation: mk-floatA 14s linear infinite;
+}
+.mk-hero__blob--2 {
+  /* highlight B — centre-right, behind "Supercharged" */
+  width: 480px;
+  height: 480px;
+  top: 30px;
+  left: auto;
+  right: 10px;
+  opacity: 0.5;
+  background: radial-gradient(circle at 50% 50%, #2f7bff, rgba(47, 123, 255, 0) 64%);
+  animation: mk-floatB 18s linear infinite;
+}
+.mk-hero:hover .mk-hero__blob { opacity: 0.72; }
+/* closed loops (start == end) so linear playback never jumps. Multiple stops =
+   a continuously wandering path instead of a two-point ping-pong. */
+@keyframes mk-floatA {
+  0%   { transform: translate(0, 0) scale(1); }
+  25%  { transform: translate(64px, 34px) scale(1.06); }
+  50%  { transform: translate(42px, 78px) scale(1.1); }
+  75%  { transform: translate(86px, 44px) scale(1.05); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes mk-floatB {
+  0%   { transform: translate(0, 0) scale(1); }
+  25%  { transform: translate(-58px, 44px) scale(1.08); }
+  50%  { transform: translate(-92px, 12px) scale(1.12); }
+  75%  { transform: translate(-36px, 56px) scale(1.06); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+/* word rotator — vertical carousel for "Building ___".
+   The window/item height is one --mk-rot-step (taller than 1em) so glyph
+   ascenders and descenders aren't clipped by overflow:hidden. Each item
+   flex-centres its glyph in the step box (robust against the headline's
+   `line-height:1`), and the list translates by exactly one step per word.
+   `top` re-seats the baseline against "Building" after the taller box. */
+.mk-rot {
+  --mk-rot-step: 1.75em;
+  position: relative;
+  top: 0;
+  display: inline-flex;
+  height: var(--mk-rot-step);
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.mk-rot__list {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.55s cubic-bezier(0.62, 0.04, 0.3, 1);
+}
+.mk-rot__item {
+  display: flex;
+  align-items: center;
+  flex: 0 0 var(--mk-rot-step);   /* exactly one step tall — never shrink to fit the window */
+  height: var(--mk-rot-step);
+  white-space: nowrap;
+}
+.mk-hero__tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mk-faint);
+}
+.mk-hero h2 {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  margin-top: 18px;
+  font-size: clamp(26px, 3.4vw, 40px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.mk-hero__grad {
+  color: var(--mk-ink);
+  transition: color var(--mk-dur) var(--mk-ease);
+}
+.mk-hero:hover .mk-hero__grad { color: var(--mk-blue); }
+.mk-hero p {
+  margin-top: 16px;
+  max-width: 460px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--mk-muted);
+}
+.mk-hero .mk-btn { margin-top: 24px; }
+
+/* ---------- 2. CTA banner — blue panel, drifting light blob ---------- */
+.mk-cta {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  padding: 52px 46px;
+  color: #fff;
+  background: linear-gradient(118deg, #0a5cff 0%, #003ec0 100%);
+  isolation: isolate;
+}
+.mk-cta__blob {
+  position: absolute;
+  z-index: -1;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  top: -200px;
+  left: -120px;
+  filter: blur(60px);
+  opacity: 0.55;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 65%);
+  transition: transform 1.2s var(--mk-ease), opacity 1.2s var(--mk-ease);
+  pointer-events: none;
+}
+.mk-cta:hover .mk-cta__blob {
+  transform: translate(360px, 150px) scale(1.2);
+  opacity: 0.75;
+}
+.mk-cta h2 {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-size: clamp(26px, 3.6vw, 40px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+.mk-cta p {
+  margin-top: 12px;
+  max-width: 480px;
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.86;
+}
+.mk-cta .mk-btn { margin-top: 26px; }
+
+/* ---------- 3. Numbered card — white -> solid blue fill, text inverts ---------- */
+.mk-num {
+  position: relative;
+  overflow: hidden;
+  background: var(--mk-card);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  padding: 26px 24px 30px;
+  box-shadow: var(--mk-shadow);
+  transition: background-color var(--mk-dur) var(--mk-ease),
+    border-color var(--mk-dur) var(--mk-ease),
+    transform var(--mk-dur) var(--mk-ease),
+    box-shadow var(--mk-dur) var(--mk-ease);
+}
+.mk-num__n {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--mk-blue);
+  transition: color var(--mk-dur) var(--mk-ease);
+}
+.mk-num__t {
+  margin-top: 18px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: color var(--mk-dur) var(--mk-ease);
+}
+.mk-num__b {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--mk-muted);
+  transition: color var(--mk-dur) var(--mk-ease);
+}
+.mk-num:hover {
+  border-color: var(--mk-blue);
+  box-shadow: 0 20px 44px -18px rgba(0, 95, 255, 0.34);
+  transform: translateY(-4px);
+}
+
+/* ---------- 4. Service/stat fill card — white -> tone fill (blue or green) ---------- */
+.mk-fill {
+  --tone: var(--mk-green);
+  --tone-deep: var(--mk-green-deep);
+  --tone-soft: var(--mk-green-soft);
+  position: relative;
+  overflow: hidden;
+  background: var(--mk-card);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  padding: 24px;
+  box-shadow: var(--mk-shadow);
+  transition: background-color var(--mk-dur) var(--mk-ease),
+    border-color var(--mk-dur) var(--mk-ease),
+    transform var(--mk-dur) var(--mk-ease),
+    box-shadow var(--mk-dur) var(--mk-ease);
+}
+.mk-fill--blue {
+  --tone: var(--mk-blue);
+  --tone-deep: var(--mk-blue-deep);
+  --tone-soft: var(--mk-blue-soft);
+}
+.mk-fill__t {
+  margin-top: 18px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: color var(--mk-dur) var(--mk-ease);
+}
+.mk-fill__b {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--mk-muted);
+  transition: color var(--mk-dur) var(--mk-ease);
+}
+.mk-fill__stat {
+  margin-top: 16px;
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  transition: color var(--mk-dur) var(--mk-ease);
+}
+.mk-fill:hover {
+  background: var(--tone);
+  border-color: var(--tone);
+  transform: translateY(-6px);
+  box-shadow: 0 24px 46px -16px color-mix(in srgb, var(--tone) 55%, transparent);
+}
+.mk-fill:hover .mk-fill__t,
+.mk-fill:hover .mk-fill__stat { color: #fff; }
+.mk-fill:hover .mk-fill__b { color: rgba(255, 255, 255, 0.85); }
+.mk-fill:hover .mk-chip {
+  background: #fff;
+  color: var(--tone);
+}
+
+/* ---------- 4b. Wide fill card with an inset bar-chart panel (single card) ----------
+   The card reuses .mk-fill (white -> tone fill, text invert, lift on hover); the
+   inset panel flips its blue overlay off to reveal a white chart + green hero bar. */
+.mk-fillchart {
+  grid-column: span 2;                 /* spans the BI + chart columns */
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;   /* text | chart panel */
+  gap: 26px;
+  align-items: stretch;
+}
+.mk-fillchart__main { align-self: start; }   /* top-align so icon + text match the sibling card */
+.mk-fillchart__panel {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--mk-r-sm);
+  padding: 22px;
+  background: var(--mk-card);          /* white base under the blue overlay */
+  display: flex;
+  align-items: flex-end;
+  min-height: 150px;
+}
+/* blue gradient overlay that fades out on hover (gradient->solid can't tween) */
+.mk-fillchart__panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, #0a5cff, #0140cc);
+  transition: opacity var(--mk-dur) var(--mk-ease);
+}
+.mk-fillchart__row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  width: 100%;
+  height: 150px;
+}
+.mk-fillchart__bar {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.32);
+  border-radius: 6px 6px 0 0;
+  transition: height var(--mk-dur) var(--mk-ease),
+    background-color var(--mk-dur) var(--mk-ease);
+}
+.mk-fillchart__bar:nth-child(1) { height: 42%; }
+.mk-fillchart__bar:nth-child(2) { height: 56%; }
+.mk-fillchart__bar:nth-child(3) { height: 84%; }
+.mk-fillchart__bar:nth-child(4) { height: 46%; }
+.mk-fillchart__bar:nth-child(5) { height: 58%; }
+.mk-fillchart__bar--hero { background: #fff; }   /* bright white hero at rest */
+.mk-fillchart:hover .mk-fillchart__panel::before { opacity: 0; }
+.mk-fillchart:hover .mk-fillchart__bar { background: #e4e7ec; }
+.mk-fillchart:hover .mk-fillchart__bar--hero { height: 100%; background: var(--mk-green); }
+@media (max-width: 920px) {
+  .mk-fillchart { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  .mk-fillchart { grid-column: span 1; }
+}
+
+/* ---------- 5. Bar-chart card — blue panel flips to a clean white chart,
+   bars desaturate to grey and the hero bar grows tall + turns green ---------- */
+.mk-bars {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--mk-r);
+  padding: 22px 22px 24px;
+  color: #fff;                         /* head label is white on the blue panel */
+  background: var(--mk-card);          /* white base, revealed as the panel fades */
+  border: 1px solid transparent;
+  box-shadow: var(--mk-shadow);
+  transition: transform var(--mk-dur) var(--mk-ease),
+    box-shadow var(--mk-dur) var(--mk-ease),
+    border-color var(--mk-dur) var(--mk-ease),
+    color var(--mk-dur) var(--mk-ease);
+}
+/* blue gradient panel sits above the white base and fades out on hover so the
+   colour change animates smoothly (a gradient->solid background can't tween) */
+.mk-bars::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, #0a5cff, #0140cc);
+  transition: opacity var(--mk-dur) var(--mk-ease);
+}
+.mk-bars__head,
+.mk-bars__row { position: relative; z-index: 1; }
+.mk-bars:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--mk-shadow-lg);
+  border-color: var(--mk-line);
+  color: var(--mk-muted);              /* label stays legible on the white card */
+}
+.mk-bars:hover::before { opacity: 0; }
+.mk-bars:hover .mk-bars__head svg { color: var(--mk-green); }
+.mk-bars__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.mk-bars__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 130px;
+  margin-top: 20px;
+}
+.mk-bars__bar {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.32);
+  border-radius: 6px 6px 0 0;
+  transition: height var(--mk-dur) var(--mk-ease),
+    background-color var(--mk-dur) var(--mk-ease);
+}
+.mk-bars__bar:nth-child(1) { height: 42%; }
+.mk-bars__bar:nth-child(2) { height: 56%; }
+.mk-bars__bar:nth-child(3) { height: 84%; }
+.mk-bars__bar:nth-child(4) { height: 46%; }
+.mk-bars__bar:nth-child(5) { height: 58%; }
+.mk-bars__bar--hero { background: #fff; }      /* hero is the bright white bar at rest */
+.mk-bars:hover .mk-bars__bar { background: #e4e7ec; }        /* grey bars on the white card */
+.mk-bars:hover .mk-bars__bar--hero {
+  height: 100%;
+  background: var(--mk-green);
+}
+
+/* ---------- 6. Process card — lift + shadow + media zoom ---------- */
+.mk-proc {
+  background: var(--mk-card);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  overflow: hidden;
+  box-shadow: var(--mk-shadow);
+  transition: transform var(--mk-dur) var(--mk-ease), box-shadow var(--mk-dur) var(--mk-ease);
+}
+.mk-proc__media {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--mk-bg);
+}
+.mk-proc__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s var(--mk-ease);
+}
+.mk-proc__body { padding: 20px 20px 22px; }
+.mk-proc__head { display: flex; align-items: center; gap: 12px; }
+.mk-proc__head h3 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.mk-proc__chip {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: grid; place-items: center;
+  background: var(--mk-blue-soft); color: var(--mk-blue);
+  transition: background-color var(--mk-dur) var(--mk-ease), color var(--mk-dur) var(--mk-ease);
+}
+.mk-proc__b { margin-top: 12px; font-size: 14px; line-height: 1.55; color: var(--mk-muted); }
+.mk-proc__list { margin-top: 14px; display: grid; gap: 8px; }
+.mk-proc__li {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--mk-ink);
+}
+.mk-proc__li svg { color: var(--mk-green); flex: none; }
+.mk-proc:hover { transform: translateY(-8px); box-shadow: var(--mk-shadow-lg); }
+.mk-proc:hover .mk-proc__media img { transform: scale(1.07); }
+.mk-proc:hover .mk-proc__chip { background: var(--mk-blue); color: #fff; }
+
+/* ---------- 7. Service detail card — blue border + lift ---------- */
+.mk-detail {
+  background: #fff;
+  border: 1.5px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  padding: 26px 26px 28px;
+  box-shadow: var(--mk-shadow);
+  transition: border-color var(--mk-dur) var(--mk-ease),
+    box-shadow var(--mk-dur) var(--mk-ease),
+    transform var(--mk-dur) var(--mk-ease);
+}
+.mk-detail__t { margin-top: 18px; font-size: 21px; font-weight: 700; letter-spacing: -0.015em; }
+.mk-detail__b { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--mk-muted); }
+.mk-detail__label {
+  margin-top: 18px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mk-blue);
+}
+.mk-detail__sub { margin-top: 5px; font-size: 13px; line-height: 1.5; color: var(--mk-muted); }
+.mk-detail:hover {
+  border-color: var(--mk-blue);
+  box-shadow: 0 20px 44px -18px rgba(0, 95, 255, 0.34);
+  transform: translateY(-4px);
+}
+
+/* ---------- 8. Comparison card — highlight border ---------- */
+.mk-cmp {
+  background: #fff;
+  border: 1.5px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  padding: 24px 26px 26px;
+  transition: border-color var(--mk-dur) var(--mk-ease),
+    box-shadow var(--mk-dur) var(--mk-ease), transform var(--mk-dur) var(--mk-ease);
+}
+.mk-cmp__head { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; }
+.mk-cmp__head--good { color: var(--mk-blue); }
+.mk-cmp__list { margin-top: 18px; display: grid; gap: 16px; }
+.mk-cmp__li { display: flex; gap: 10px; }
+.mk-cmp__li svg { flex: none; margin-top: 2px; }
+.mk-cmp__li b { font-size: 14px; font-weight: 600; }
+.mk-cmp__li p { margin-top: 3px; font-size: 13px; line-height: 1.5; color: var(--mk-muted); }
+.mk-cmp--bad .mk-cmp__li svg { color: #e0405a; }
+.mk-cmp--good .mk-cmp__li svg { color: var(--mk-blue); }
+.mk-cmp--good:hover,
+.mk-cmp--good:focus-within {
+  border-color: var(--mk-blue);
+  box-shadow: 0 20px 44px -18px rgba(0, 95, 255, 0.32);
+  transform: translateY(-4px);
+}
+.mk-cmp--bad:hover { border-color: #d7dbe0; transform: translateY(-2px); }
+
+/* ---------- 9. Image banner — media zoom + accent colorize ---------- */
+.mk-banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  min-height: 260px;
+  display: flex;
+  align-items: flex-end;
+  color: #fff;
+  isolation: isolate;
+}
+.mk-banner img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s var(--mk-ease);
+}
+.mk-banner__veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(8, 12, 24, 0.15) 0%, rgba(8, 12, 24, 0.78) 100%);
+  transition: background 0.6s var(--mk-ease);
+}
+.mk-banner__body { padding: 30px 32px; }
+.mk-banner__h {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+.mk-banner__accent {
+  color: #6ea8ff;
+  transition: color var(--mk-dur) var(--mk-ease);
+}
+.mk-banner p { margin-top: 8px; font-size: 14px; line-height: 1.55; opacity: 0.85; max-width: 460px; }
+.mk-banner:hover img { transform: scale(1.07); }
+.mk-banner:hover .mk-banner__veil {
+  background: linear-gradient(180deg, rgba(0, 60, 200, 0.22) 0%, rgba(8, 12, 24, 0.82) 100%);
+}
+.mk-banner:hover .mk-banner__accent { color: #ffd34d; }
+
+/* ---------- 10. Integration row — logo colorize ---------- */
+.mk-integ {
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  padding: 18px 20px;
+  box-shadow: var(--mk-shadow);
+  transition: box-shadow var(--mk-dur) var(--mk-ease), transform var(--mk-dur) var(--mk-ease);
+}
+.mk-integ:hover { transform: translateY(-4px); box-shadow: var(--mk-shadow-lg); }
+.mk-integ__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+.mk-integ__row + .mk-integ__row { border-top: 1px solid var(--mk-line); }
+.mk-integ__logo {
+  width: 36px; height: 36px; border-radius: 9px;
+  display: grid; place-items: center;
+  background: #f1f3f6; color: var(--mk-faint);
+  transition: background-color var(--mk-dur) var(--mk-ease), color var(--mk-dur) var(--mk-ease);
+}
+.mk-integ__name { font-size: 14px; font-weight: 600; }
+.mk-integ__meta { font-size: 12px; color: var(--mk-faint); margin-top: 1px; }
+.mk-integ__row:hover .mk-integ__logo { background: var(--mk-blue-soft); color: var(--mk-blue); }
+
+/* ---------- 11. Channel split — cursor-X expands the nearest logo segment ---------- */
+.mk-split {
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  padding: 20px 22px 22px;
+  box-shadow: var(--mk-shadow);
+}
+.mk-split__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mk-faint);
+}
+.mk-split__row {
+  display: flex;
+  gap: 10px;
+  height: 62px;
+  margin-top: 14px;
+  touch-action: none;
+}
+.mk-split__seg {
+  flex-grow: 1;
+  flex-basis: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 14px;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  color: #fff;
+  transition: flex-grow var(--mk-dur) var(--mk-ease),
+    box-shadow var(--mk-dur) var(--mk-ease);
+}
+.mk-split__seg--light {
+  color: var(--mk-ink);
+  border: 1px solid var(--mk-line);
+}
+.mk-split__seg.is-active {
+  flex-grow: 2.8;
+  justify-content: flex-start;
+  box-shadow: 0 12px 26px -12px rgba(16, 24, 40, 0.4);
+}
+.mk-split__logo {
+  flex: none;
+  display: grid;
+  place-items: center;
+}
+.mk-split__name {
+  max-width: 0;
+  opacity: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: max-width var(--mk-dur) var(--mk-ease),
+    opacity 0.35s var(--mk-ease);
+}
+.mk-split__seg.is-active .mk-split__name {
+  max-width: 140px;
+  opacity: 1;
+}
+
+/* ---------- CTA light variant + tags ---------- */
+.mk-cta--light {
+  background: #fff;
+  color: var(--mk-ink);
+  border: 1px solid var(--mk-line);
+}
+.mk-cta--light .mk-cta__blob {
+  background: radial-gradient(circle, rgba(120, 165, 255, 0.85), rgba(120, 165, 255, 0) 66%);
+  opacity: 0.7;
+  top: auto;
+  bottom: -220px;
+  left: -160px;
+}
+.mk-cta--light .mk-cta__blob--2 {
+  top: -200px;
+  left: auto;
+  right: -160px;
+  bottom: auto;
+}
+.mk-cta--light:hover .mk-cta__blob { transform: translate(280px, -120px) scale(1.18); }
+.mk-cta--light:hover .mk-cta__blob--2 { transform: translate(-260px, 140px) scale(1.18); }
+.mk-cta--light p { opacity: 1; color: var(--mk-muted); }
+.mk-cta__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.mk-cta__tags span { display: inline-flex; align-items: center; gap: 7px; }
+.mk-cta--light .mk-cta__tags svg { color: var(--mk-green); }
+.mk-cta--light { text-align: center; }
+.mk-cta--light h2, .mk-cta--light p { margin-left: auto; margin-right: auto; }
+.mk-cta--light .mk-cta__tags { justify-content: center; }
+
+/* =====================================================================
+   Home page composition — layout shell that hosts the kit components
+   ===================================================================== */
+.mk-shell { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.mk-section-pad { padding: 84px 0; }
+
+/* nav */
+.mk-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid var(--mk-line);
+}
+.mk-nav__in {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.mk-nav__brand {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+.mk-nav__links { display: flex; gap: 28px; }
+.mk-nav__links a {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--mk-muted);
+  transition: color 0.2s var(--mk-ease);
+}
+.mk-nav__links a:hover { color: var(--mk-ink); }
+.mk-nav__links a.is-active { color: var(--mk-blue); }
+@media (max-width: 760px) { .mk-nav__links { display: none; } }
+
+/* hero bento — left column (hero + velocity/stat) is the wide one,
+   right column holds the Building Systems card + tall ROI dashboard */
+.mk-hero-bento {
+  display: grid;
+  grid-template-columns: 1.85fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+  padding-top: 40px;
+}
+.mk-hero-col { display: flex; flex-direction: column; gap: 18px; }
+.mk-hero-col > .mk-hero { flex: 1; }
+.mk-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 920px) {
+  .mk-hero-bento { grid-template-columns: 1fr; }
+  .mk-hero-col > .mk-hero { flex: none; }
+}
+
+/* "Building Systems." card — blue border at rest, per the design */
+.mk-build {
+  background: #fbfcff;
+  border: 1.5px solid var(--mk-blue);
+  border-radius: var(--mk-r);
+  padding: 30px 26px;
+  display: grid;
+  place-items: center;
+  flex: 1;
+  min-height: 120px;
+  box-shadow: var(--mk-shadow);
+  transition: box-shadow var(--mk-dur) var(--mk-ease), transform var(--mk-dur) var(--mk-ease);
+}
+.mk-build span {
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+/* only the top-level "Building ___" container is the flex row — scope tightly so
+   the rotator's own nested spans (.mk-rot__list / __item) keep their layout and
+   don't inherit the word gap, which would mistune the carousel step */
+.mk-build > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28em;
+}
+.mk-build b { color: var(--mk-blue); font-weight: 700; }
+.mk-build:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -18px rgba(0, 122, 255, 0.32);
+}
+
+/* dashboard ROI card */
+.mk-dash {
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  padding: 18px 20px;
+  box-shadow: var(--mk-shadow);
+}
+.mk-dash__top {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--mk-faint);
+}
+.mk-dash__top svg { color: var(--mk-green); }
+.mk-dash__row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px; margin-top: 12px;
+  border: 1px solid var(--mk-line); border-radius: 12px;
+  transition: border-color var(--mk-dur) var(--mk-ease), background-color var(--mk-dur) var(--mk-ease);
+}
+.mk-dash__row:hover { border-color: var(--mk-blue); background: var(--mk-blue-soft); }
+.mk-dash__ic {
+  width: 38px; height: 38px; border-radius: 10px; flex: none;
+  display: grid; place-items: center;
+  background: var(--mk-blue-soft); color: var(--mk-blue);
+}
+.mk-dash__nm { font-size: 14px; font-weight: 600; }
+.mk-dash__mt { font-size: 12px; color: var(--mk-faint); margin-top: 1px; }
+
+/* section heading */
+.mk-shead { text-align: center; max-width: 720px; margin: 0 auto 44px; }
+.mk-shead__ey {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--mk-blue);
+}
+.mk-shead h2 {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  margin-top: 14px;
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+.mk-shead--split {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+  max-width: 1100px; text-align: left; align-items: center;
+}
+.mk-shead--split h2 { margin-top: 10px; }
+.mk-shead--split p { font-size: 15px; line-height: 1.7; color: var(--mk-muted); }
+@media (max-width: 760px) { .mk-shead--split { grid-template-columns: 1fr; gap: 16px; } }
+
+/* feature bento */
+.mk-feat {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.mk-feat__wide { grid-column: span 2; }
+@media (max-width: 920px) {
+  .mk-feat { grid-template-columns: 1fr 1fr; }
+  .mk-feat__wide { grid-column: span 2; }
+}
+@media (max-width: 620px) {
+  .mk-feat { grid-template-columns: 1fr; }
+  .mk-feat__wide { grid-column: span 1; }
+}
+
+/* dark "everything you need" card */
+.mk-everything {
+  grid-column: span 2;
+  background: #14161c;
+  color: #fff;
+  border-radius: var(--mk-r);
+  padding: 30px 32px;
+}
+.mk-everything h3 {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-size: 22px; font-weight: 800; letter-spacing: -0.02em;
+}
+.mk-everything__grid {
+  margin-top: 22px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.mk-everything__li {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 13.5px;
+  transition: background-color var(--mk-dur) var(--mk-ease), transform var(--mk-dur) var(--mk-ease);
+}
+.mk-everything__li svg { color: #4f9bff; flex: none; }
+.mk-everything__li:hover { background: rgba(0, 95, 255, 0.22); transform: translateX(4px); }
+@media (max-width: 620px) {
+  .mk-everything { grid-column: span 1; }
+  .mk-everything__grid { grid-template-columns: 1fr; }
+}
+
+/* numbered cards row */
+.mk-num-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+}
+@media (max-width: 920px) { .mk-num-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .mk-num-grid { grid-template-columns: 1fr; } }
+
+/* footer */
+.mk-foot { border-top: 1px solid var(--mk-line); background: #eef0f3; margin-top: 40px; }
+.mk-foot__in {
+  max-width: 1200px; margin: 0 auto; padding: 56px 24px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+}
+.mk-foot__brand {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-weight: 800; font-size: 18px; letter-spacing: -0.01em;
+}
+.mk-foot p { margin-top: 12px; max-width: 360px; font-size: 14px; line-height: 1.6; color: var(--mk-muted); }
+.mk-foot__label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--mk-faint);
+}
+.mk-foot__form { display: flex; gap: 10px; margin-top: 14px; max-width: 320px; }
+.mk-foot__form input {
+  flex: 1; font: inherit; font-size: 14px;
+  padding: 11px 14px; border-radius: 10px;
+  border: 1px solid var(--mk-line); background: #fff; color: var(--mk-ink);
+}
+.mk-foot__form input:focus { outline: 2px solid var(--mk-blue); outline-offset: 1px; }
+.mk-foot__form button {
+  display: grid; place-items: center;
+  width: 44px; border: 0; border-radius: 10px;
+  background: var(--mk-blue); color: #fff; cursor: pointer;
+  transition: transform 0.25s var(--mk-ease);
+}
+.mk-foot__form button:hover { transform: translateX(2px); }
+@media (max-width: 620px) { .mk-foot__in { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   Design-reference corrections — align tokens + type to
+   designAssets/Colour And Typography.png (source of truth):
+   Primary #007AFF · Ink #1A1A1B · Background #F9F9F9
+   Headlines = Satoshi Bold (700) · Body + buttons = DM Sans
+   ===================================================================== */
+.mk {
+  --mk-blue: #007aff;
+  --mk-blue-deep: #0061d6;
+  --mk-blue-soft: #e6f1ff;
+  --mk-ink: #1a1a1b;
+  --mk-bg: #f9f9f9;
+  background: var(--mk-bg);
+}
+
+/* every headline/title uses Satoshi, not the body font */
+.mk-masthead h1,
+.mk-hero h2,
+.mk-cta h2,
+.mk-shead h2,
+.mk-num__t,
+.mk-num__n,
+.mk-fill__t,
+.mk-fill__stat,
+.mk-proc__head h3,
+.mk-detail__t,
+.mk-cmp__head,
+.mk-build span,
+.mk-everything h3,
+.mk-banner__h {
+  font-family: var(--font-satoshi), var(--font-dm), system-ui, sans-serif;
+}
+
+/* headlines are Bold (700), not Black (900) */
+.mk-masthead h1,
+.mk-hero h2,
+.mk-cta h2,
+.mk-shead h2,
+.mk-fill__stat,
+.mk-everything h3,
+.mk-banner__h {
+  font-weight: 700;
+}
+.mk-num__t,
+.mk-fill__t,
+.mk-proc__head h3,
+.mk-detail__t,
+.mk-cmp__head {
+  font-weight: 700;
+}
+
+/* size: hero closer to the H1 scale, body/buttons to the 16/Bold spec */
+.mk-hero h2 { font-size: clamp(34px, 4.2vw, 54px); line-height: 1.04; }
+.mk-hero p,
+.mk-shead--split p { font-size: 15.5px; }
+.mk-btn { font-size: 15px; font-weight: 700; }
+
+/* design shows the hero lead in blue at rest; hover deepens it */
+.mk-hero__grad { color: var(--mk-blue); }
+.mk-hero:hover .mk-hero__grad { color: var(--mk-blue-deep); }
+
+/* channel split nested bare inside the ROI dashboard card */
+.mk-split--bare {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+.mk-dash .mk-split--bare {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--mk-line);
+}
+.mk-split--bare .mk-split__row { height: 56px; }
+
+/* detail-card icon chip + green featured variant */
+.mk-detail__chip {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--mk-blue-soft);
+  color: var(--mk-blue);
+  transition: background-color var(--mk-dur) var(--mk-ease), color var(--mk-dur) var(--mk-ease);
+}
+.mk-detail--feat {
+  background: var(--mk-green);
+  border-color: var(--mk-green);
+  box-shadow: 0 18px 40px -18px rgba(38, 185, 83, 0.45);
+}
+.mk-detail--feat .mk-detail__t { color: #fff; }
+.mk-detail--feat .mk-detail__b { color: rgba(255, 255, 255, 0.9); }
+.mk-detail--feat .mk-detail__label { color: #fff; }
+.mk-detail--feat .mk-detail__sub { color: rgba(255, 255, 255, 0.82); }
+.mk-detail--feat .mk-detail__chip { background: rgba(255, 255, 255, 0.22); color: #fff; }
+.mk-detail--feat:hover {
+  border-color: var(--mk-green);
+  box-shadow: 0 24px 50px -18px rgba(38, 185, 83, 0.55);
+}
+
+/* light bar-chart card (white, blue bars) — the Live Revenue card */
+.mk-bars--light {
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  color: var(--mk-ink);
+}
+.mk-bars--light .mk-bars__head { opacity: 1; color: var(--mk-faint); }
+.mk-bars--light .mk-bars__head svg { color: var(--mk-blue); }
+.mk-bars--light .mk-bars__bar { background: var(--mk-blue-soft); }
+.mk-bars--light .mk-bars__bar--hero { background: var(--mk-blue); }
+.mk-bars--light:hover .mk-bars__bar--hero { background: var(--mk-green); }
+
+/* ===================================================================
+   Services page composition
+   =================================================================== */
+/* top block: col1 stacks two cards, the green card sits centre, the CTA spans
+   the centre + right columns underneath — matching the design's arrangement */
+.mk-svc-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas:
+    "c1 gc bi"
+    "c1 cta cta";
+  gap: 22px;
+  align-items: start;
+}
+.mk-svc-top__c1 {
+  grid-area: c1;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.mk-svc-top__gc { grid-area: gc; }
+.mk-svc-top__bi { grid-area: bi; }
+.mk-svc-top__cta { grid-area: cta; align-self: start; }
+
+.mk-svc-bottom {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .mk-svc-top {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "c1 gc" "bi cta";
+  }
+  .mk-svc-bottom { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 620px) {
+  .mk-svc-top {
+    grid-template-columns: 1fr;
+    grid-template-areas: "c1" "gc" "bi" "cta";
+  }
+  .mk-svc-top__c1 { display: contents; }
+  .mk-svc-bottom { grid-template-columns: 1fr; }
+}
+
+/* executive intelligence — text beside dashboard image */
+.mk-exec {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+.mk-exec__ey {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mk-blue);
+}
+.mk-exec h2 {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  margin-top: 14px;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+.mk-exec__lead {
+  margin-top: 16px;
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--mk-muted);
+}
+.mk-exec__list { margin-top: 26px; display: grid; gap: 18px; }
+.mk-exec__li { display: flex; gap: 12px; }
+.mk-exec__li > svg { flex: none; margin-top: 2px; color: var(--mk-blue); }
+.mk-exec__li b { font-size: 15px; font-weight: 600; }
+.mk-exec__li p { margin-top: 3px; font-size: 13.5px; line-height: 1.5; color: var(--mk-muted); }
+.mk-exec .mk-btn { margin-top: 30px; }
+.mk-exec__media {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--mk-shadow-lg);
+  aspect-ratio: 4 / 3;
+}
+.mk-exec__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s var(--mk-ease); }
+.mk-exec__media:hover img { transform: scale(1.05); }
+@media (max-width: 860px) { .mk-exec { grid-template-columns: 1fr; gap: 32px; } }
+
+/* ===================================================================
+   Services 1:1 fidelity — hero tag pill, taller detail cards with a
+   divider, Live Revenue card, and the Target Efficiency score ring
+   =================================================================== */
+
+/* hero tag becomes a blue pill (matches both hero designs) */
+.mk-hero__tag {
+  display: inline-block;
+  padding: 7px 15px;
+  border-radius: 999px;
+  background: var(--mk-blue-soft);
+  color: var(--mk-blue);
+  letter-spacing: 0.12em;
+}
+
+/* detail cards: airy top, big title, divider before the labelled blocks */
+.mk-detail { padding: 28px 28px 30px; }
+.mk-detail__t { margin-top: 36px; font-size: 28px; line-height: 1.12; }
+.mk-detail__b { margin-top: 16px; font-size: 16px; line-height: 1.6; }
+.mk-detail__divider { height: 1px; background: var(--mk-line); margin-top: 26px; }
+.mk-detail__label { margin-top: 16px; }
+.mk-detail--feat .mk-detail__divider { background: rgba(255, 255, 255, 0.32); }
+
+/* compact card (SEO / Brand / Operational): small icon inline with the title */
+.mk-detail--compact { padding: 24px 24px 26px; }
+.mk-detail__head { display: flex; align-items: center; gap: 10px; }
+.mk-detail__ic { display: inline-flex; color: var(--mk-blue); flex: none; }
+.mk-detail--compact .mk-detail__t { margin-top: 0; font-size: 20px; line-height: 1.2; }
+.mk-detail--compact .mk-detail__b { margin-top: 14px; font-size: 14px; }
+.mk-detail--compact .mk-detail__divider { margin-top: 20px; }
+
+/* Live Revenue card — white, blue chip, all-blue bars (4th tallest) */
+.mk-rev {
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  padding: 22px 24px 24px;
+  box-shadow: var(--mk-shadow);
+  transition: box-shadow var(--mk-dur) var(--mk-ease), transform var(--mk-dur) var(--mk-ease);
+}
+.mk-rev:hover { transform: translateY(-4px); box-shadow: var(--mk-shadow-lg); }
+.mk-rev__head { display: flex; align-items: center; justify-content: space-between; }
+.mk-rev__chip {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--mk-blue-soft);
+  color: var(--mk-blue);
+}
+.mk-rev__label { font-size: 15px; font-weight: 600; color: #374151; }
+.mk-rev__row { display: flex; align-items: flex-end; gap: 12px; height: 110px; margin-top: 24px; }
+.mk-rev__bar {
+  flex: 1;
+  border-radius: 6px 6px 0 0;
+  background: #b9d0fa;
+  transform-origin: bottom;
+  transition: transform 0.5s var(--mk-ease);
+}
+.mk-rev__bar:nth-child(1) { height: 36%; background: #d6e3fc; transition-delay: 0s; }
+.mk-rev__bar:nth-child(2) { height: 58%; background: #a8c5f7; transition-delay: 0.04s; }
+.mk-rev__bar:nth-child(3) { height: 44%; background: #cadcfb; transition-delay: 0.08s; }
+.mk-rev__bar--tall { height: 90%; background: #7faaf1; transition-delay: 0.12s; }
+.mk-rev__bar:nth-child(5) { height: 62%; background: #a8c5f7; transition-delay: 0.16s; }
+.mk-rev:hover .mk-rev__bar { transform: scaleY(1.06); }
+.mk-rev:hover .mk-rev__bar--tall { transform: scaleY(1.12); }
+
+/* Target Efficiency score card — green ring draws around the number on hover */
+.mk-score {
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  padding: 28px 30px;
+  box-shadow: var(--mk-shadow);
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  transition: box-shadow var(--mk-dur) var(--mk-ease), transform var(--mk-dur) var(--mk-ease);
+}
+.mk-score:hover { transform: translateY(-4px); box-shadow: var(--mk-shadow-lg); }
+.mk-score__ring { position: relative; width: 80px; height: 80px; flex: none; }
+.mk-score__ring svg { width: 80px; height: 80px; transform: rotate(-90deg); }
+.mk-score__track { fill: none; stroke: var(--mk-green-soft); stroke-width: 6; opacity: 0; transition: opacity 0.4s var(--mk-ease); }
+.mk-score__bar {
+  fill: none;
+  stroke: var(--mk-green);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.9s var(--mk-ease);
+}
+.mk-score:hover .mk-score__track { opacity: 1; }
+.mk-score:hover .mk-score__bar { stroke-dashoffset: var(--mk-score-off) !important; }
+.mk-score__num {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--mk-ink);
+}
+.mk-score__meta b {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.mk-score__meta p { margin-top: 4px; font-size: 13.5px; color: var(--mk-muted); }
+
+/* ===================================================================
+   About Us page composition
+   =================================================================== */
+
+/* blue hero banner — "The Architecture of Exponential Growth" */
+.mk-about-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 92px 24px 96px;
+  color: #fff;
+  text-align: center;
+  background: linear-gradient(135deg, #2f6bff 0%, #0a40c6 100%);
+  isolation: isolate;
+}
+.mk-about-hero__inner { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
+.mk-about-hero__blob {
+  position: absolute;
+  z-index: -1;
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 65%);
+  pointer-events: none;
+  top: -160px;
+  left: -120px;
+  animation: mk-floatA 18s var(--mk-ease) infinite;
+}
+.mk-about-hero__blob--2 { top: auto; left: auto; bottom: -200px; right: -120px; animation: mk-floatB 22s var(--mk-ease) infinite; }
+.mk-about-hero h1 {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-size: clamp(38px, 6vw, 62px);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+}
+.mk-about-hero h1 em { font-style: italic; display: block; }
+.mk-about-hero p {
+  margin: 24px auto 0;
+  max-width: 720px;
+  font-size: 16px;
+  line-height: 1.7;
+  opacity: 0.9;
+}
+
+/* about section heading — big title + muted subtitle, left aligned */
+.mk-ahead { margin: 0 0 32px; }
+.mk-ahead h2 {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-size: clamp(26px, 3.4vw, 34px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  max-width: 760px;
+}
+.mk-ahead p { margin-top: 8px; font-size: 15px; color: var(--mk-muted); }
+
+/* core principles bento — narrow left card, wide right column */
+.mk-principles {
+  display: grid;
+  grid-template-columns: 0.47fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+.mk-principles__tall { grid-row: 1 / 3; }
+.mk-principle {
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  padding: 28px;
+  box-shadow: var(--mk-shadow);
+  height: 100%;
+  transition: transform var(--mk-dur) var(--mk-ease), box-shadow var(--mk-dur) var(--mk-ease);
+}
+.mk-principle:hover { transform: translateY(-5px); box-shadow: var(--mk-shadow-lg); }
+.mk-principle--accent { background: #eef0fb; border-color: #e2e5f6; }
+.mk-principle__ic {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--mk-blue-soft);
+  color: var(--mk-blue);
+}
+.mk-principle--accent .mk-principle__ic { background: #fff; }
+.mk-principle h3 {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  margin-top: 26px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.mk-principle__list { margin-top: 14px; display: grid; gap: 10px; }
+.mk-principle__list p { font-size: 14px; line-height: 1.55; color: var(--mk-muted); }
+.mk-principle__list b { color: var(--mk-ink); font-weight: 600; }
+.mk-principle__bar { margin-top: 22px; height: 5px; border-radius: 999px; background: var(--mk-line); overflow: hidden; }
+.mk-principle__bar span {
+  display: block;
+  height: 100%;
+  width: 38%;
+  border-radius: 999px;
+  background: var(--mk-green);
+  transition: width 0.7s var(--mk-ease);
+}
+.mk-principle:hover .mk-principle__bar span { width: 82%; }
+@media (max-width: 860px) {
+  .mk-principles { grid-template-columns: 1fr; }
+  .mk-principles__tall { grid-row: auto; }
+}
+
+/* methods in motion bento */
+.mk-methods {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+.mk-methods__main {
+  grid-row: 1 / 3;
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  padding: 30px 30px 0;
+  box-shadow: var(--mk-shadow);
+  overflow: hidden;
+  transition: box-shadow var(--mk-dur) var(--mk-ease);
+}
+.mk-methods__main:hover { box-shadow: var(--mk-shadow-lg); }
+.mk-methods__main h3 {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.mk-methods__main p { margin-top: 12px; font-size: 14.5px; line-height: 1.6; color: var(--mk-muted); max-width: 420px; }
+.mk-methods__shot {
+  margin-top: 26px;
+  border-radius: 14px 14px 0 0;
+  overflow: hidden;
+  box-shadow: 0 -1px 0 var(--mk-line);
+}
+.mk-methods__shot img { width: 100%; display: block; transition: transform 0.7s var(--mk-ease); }
+.mk-methods__main:hover .mk-methods__shot img { transform: scale(1.03); }
+.mk-method {
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  border-radius: var(--mk-r);
+  padding: 26px;
+  box-shadow: var(--mk-shadow);
+  transition: transform var(--mk-dur) var(--mk-ease), box-shadow var(--mk-dur) var(--mk-ease);
+}
+.mk-method:hover { transform: translateY(-5px); box-shadow: var(--mk-shadow-lg); }
+.mk-method__ic {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  background: var(--mk-blue-soft);
+  color: var(--mk-blue);
+}
+.mk-method h3 {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  margin-top: 18px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.mk-method p { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--mk-muted); }
+.mk-method__bar { margin-top: 16px; height: 5px; border-radius: 999px; background: var(--mk-line); overflow: hidden; }
+.mk-method__bar span { display: block; height: 100%; width: 46%; border-radius: 999px; background: var(--mk-blue); transition: width 0.7s var(--mk-ease); }
+.mk-method:hover .mk-method__bar span { width: 90%; }
+@media (max-width: 860px) {
+  .mk-methods { grid-template-columns: 1fr; }
+  .mk-methods__main { grid-row: auto; }
+}
+
+/* the team — dark split card */
+.mk-team {
+  display: grid;
+  grid-template-columns: 0.82fr 1.18fr;
+  background: #141720;
+  border-radius: 24px;
+  overflow: hidden;
+  color: #fff;
+}
+.mk-team__photo {
+  position: relative;
+  min-height: 360px;
+  background: radial-gradient(120% 120% at 30% 20%, #2a2f3d, #0c0e14);
+  display: flex;
+  align-items: flex-end;
+  padding: 28px;
+}
+.mk-team__name b { font-family: var(--font-satoshi), var(--font-dm), sans-serif; font-size: 18px; font-weight: 700; }
+.mk-team__name span { display: block; margin-top: 4px; font-size: 11px; letter-spacing: 0.12em; color: #4f9bff; }
+.mk-team__body { padding: 40px 42px; }
+.mk-team__ey { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #4f9bff; }
+.mk-team__body h2 {
+  font-family: var(--font-satoshi), var(--font-dm), sans-serif;
+  margin-top: 14px;
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.mk-team__body p { margin-top: 18px; font-size: 14.5px; line-height: 1.7; color: rgba(255, 255, 255, 0.74); max-width: 560px; }
+@media (max-width: 760px) { .mk-team { grid-template-columns: 1fr; } }
+
+/* centred CTA variant */
+.mk-cta--center { text-align: center; }
+.mk-cta--center h2, .mk-cta--center p { margin-left: auto; margin-right: auto; }
+.mk-cta--center p { max-width: 460px; }
+.mk-cta--center .mk-btn { margin-top: 24px; }
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .mk *,
+  .mk *::before,
+  .mk *::after {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+  }
+}

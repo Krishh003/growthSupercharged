@@ -1,0 +1,6 @@
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ ./app/globals.css
+Module not found: Can't resolve 'C:\Users\Krishh\Pristine Forests\growthSupercharged\app\globals.css'
+
+https://nextjs.org/docs/messages/module-not-found

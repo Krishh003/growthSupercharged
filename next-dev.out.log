@@ -1,0 +1,36 @@
+
+> growth-supercharge@1.0.0 dev
+> next dev --port 3000
+
+   ▲ Next.js 15.5.19
+   - Local:        http://localhost:3000
+   - Network:      http://172.19.96.1:3000
+
+ ✓ Starting...
+ ✓ Ready in 3.1s
+ ○ Compiling / ...
+ ✓ Compiled / in 1801ms (536 modules)
+ GET / 200 in 2747ms
+ GET / 200 in 122ms
+ ○ Compiling /services ...
+ ✓ Compiled /services in 654ms (544 modules)
+ GET /services 200 in 1098ms
+ ✓ Compiled /about in 349ms (552 modules)
+ GET /about 200 in 613ms
+ ✓ Compiled /contact in 374ms (560 modules)
+ GET /contact 200 in 641ms
+ ✓ Compiled /_not-found in 465ms (565 modules)
+ GET /methods 404 in 722ms
+ GET / 200 in 112ms
+ GET /services 200 in 114ms
+ GET /about 200 in 103ms
+ GET /contact 200 in 114ms
+ GET / 200 in 68ms
+ GET /services 200 in 57ms
+ GET /about 200 in 56ms
+ GET /contact 200 in 56ms
+ GET /methods 404 in 46ms
+ GET / 200 in 58ms
+ GET /services 200 in 58ms
+ GET /about 200 in 76ms
+ GET /contact 200 in 59ms

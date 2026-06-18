@@ -1,0 +1,43 @@
+
+> growth-supercharge@1.0.0 dev
+> next dev --hostname 127.0.0.1 --port 3001
+
+   ▲ Next.js 15.5.19
+   - Local:        http://127.0.0.1:3001
+   - Network:      http://127.0.0.1:3001
+
+ ✓ Starting...
+ ✓ Ready in 2.7s
+ ○ Compiling / ...
+ ✓ Compiled / in 1022ms (606 modules)
+ GET / 200 in 1632ms
+ GET / 200 in 179ms
+ GET / 200 in 129ms
+ ○ Compiling /services ...
+ ✓ Compiled /services in 543ms (608 modules)
+ GET /services 200 in 1174ms
+ ✓ Compiled /methods in 321ms (610 modules)
+ GET /methods 200 in 678ms
+ ✓ Compiled /about in 294ms (612 modules)
+ GET /about 200 in 749ms
+ ✓ Compiled /contact in 321ms (617 modules)
+ GET /contact 200 in 665ms
+ GET / 200 in 193ms
+ GET / 200 in 192ms
+ GET /services 200 in 253ms
+ GET /methods 200 in 216ms
+ GET /about 200 in 214ms
+ GET /contact 200 in 189ms
+ GET / 200 in 200ms
+ GET /services 200 in 248ms
+ GET /methods 200 in 205ms
+ GET /about 200 in 172ms
+ GET /contact 200 in 154ms
+ ✓ Compiled in 205ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.9s (609 modules)
+ GET / 200 in 3360ms
+ GET / 200 in 51ms
+ ✓ Compiled in 4s (563 modules)
+ GET / 200 in 432ms
+ ✓ Compiled in 805ms (563 modules)

@@ -1,0 +1,9 @@
+home: content x[0-1279] y[872-6514] => 1279x5642
+home: 4 tiles
+methods: content x[1-1280] y[872-6763] => 1279x5891
+methods: 4 tiles
+services: content x[2-1281] y[2454-5795] => 1279x3341
+services: 3 tiles
+contact: content x[1-1280] y[2454-4091] => 1279x1637
+contact: 2 tiles
+DONE

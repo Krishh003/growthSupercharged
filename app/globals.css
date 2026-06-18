@@ -1,0 +1,72 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background: #fff;
+  color: #1a1a1b;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+main {
+  min-height: 100vh;
+}
+
+img {
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.design-asset-page {
+  background: #fff;
+  min-height: 100vh;
+}
+
+.design-asset-frame {
+  margin: 0 auto;
+  max-width: var(--asset-frame-width);
+  position: relative;
+  width: 100%;
+}
+
+.design-asset-frame--crop {
+  overflow: hidden;
+}
+
+.design-asset-image {
+  display: block;
+  height: auto;
+  max-width: none;
+  width: 100%;
+}
+
+.design-asset-frame--crop .design-asset-image {
+  position: absolute;
+}
+
+.design-asset-hotspot {
+  display: block;
+  position: absolute;
+  z-index: 2;
+}
+
+.design-asset-hotspot:focus-visible {
+  outline: 2px solid rgba(0, 122, 255, .75);
+  outline-offset: 2px;
+}
