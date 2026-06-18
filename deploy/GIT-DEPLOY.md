@@ -23,10 +23,18 @@ docker compose up -d --build
 
 # verify
 docker compose ps
-curl -I http://10.10.10.100:3000     # expect 200 OK
+curl -I http://10.10.10.100:8090     # expect 200 OK
 ```
 
-Then give your admin **`10.10.10.100:3000`** + a hostname (e.g.
+Host port is **8090** (3000 was already in use on the server). If 8090 is
+also taken, pick another without editing tracked files:
+
+```bash
+echo "HOST_PORT=8095" > .env     # .env is gitignored; compose reads it
+docker compose up -d
+```
+
+Then give your admin **`10.10.10.100:8090`** + a hostname (e.g.
 `http://growth.internal`) to point at it.
 
 ---
@@ -64,6 +72,6 @@ A deploy key is scoped to this one repo — safer than a personal token.
 
 ## Firewall
 
-LAN must reach port 3000: `sudo ufw allow 3000/tcp` (Ubuntu) or the
+LAN must reach the host port 8090: `sudo ufw allow 8090/tcp` (Ubuntu) or the
 firewalld equivalent. If the admin's proxy is on the same box, you can bind
 to localhost only and let the proxy reach it.

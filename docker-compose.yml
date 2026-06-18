@@ -3,5 +3,8 @@ services:
     image: growth-supercharged:1.0.0
     build: .
     ports:
-      - "3000:3000"     # host:container — admin maps the URL to 10.10.10.100:3000
+      # host:container. Host port defaults to 8090 (3000 was taken on the
+      # server). To use a different host port without editing this file, put
+      # HOST_PORT=xxxx in a .env file beside it. Container stays 3000 inside.
+      - "${HOST_PORT:-8090}:3000"
     restart: unless-stopped
