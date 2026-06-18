@@ -1,0 +1,7 @@
+services:
+  web:
+    image: growth-supercharged:1.0.0
+    build: .
+    ports:
+      - "3000:3000"     # host:container — admin maps the URL to 10.10.10.100:3000
+    restart: unless-stopped

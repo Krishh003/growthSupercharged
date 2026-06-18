@@ -27,3 +27,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# large design sources (not used by the build — designAssets IS, keep it)
+/design/
+/animAssets/
+/Final Design.png
+/Final Design.svg

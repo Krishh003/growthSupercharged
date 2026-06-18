@@ -1,0 +1,22 @@
+# build artifacts + deps (rebuilt inside the image)
+node_modules
+.next
+out
+build
+
+# logs / tooling / vcs
+*.log
+.git
+.claude
+.cmp
+deploy
+
+# scratch ESM scripts at repo root — keep the Next config though
+/*.mjs
+!next.config.mjs
+
+# large design SOURCES not used by the build (designAssets IS used — keep it)
+/design/
+/animAssets/
+/*.png
+/*.svg

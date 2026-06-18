@@ -1,0 +1,30 @@
+[Unit]
+Description=Growth Supercharged (Next.js)
+After=network.target
+
+[Service]
+Type=simple
+
+# User that owns the files and runs the process.
+# www-data exists on Debian/Ubuntu. On RHEL/Alma use "nginx" or create a
+# dedicated user: sudo useradd --system --no-create-home growth
+User=www-data
+
+# Absolute path to where you copied the project on the server.
+WorkingDirectory=/opt/growth-supercharged
+
+Environment=NODE_ENV=production
+Environment=PORT=3000
+# next start binds 0.0.0.0 by default, so it is reachable on the LAN at
+# 10.10.10.100:3000. HOSTNAME is set explicitly to be safe.
+Environment=HOSTNAME=0.0.0.0
+
+# Confirm the npm path on your server with: which npm
+# NodeSource/apt installs put it at /usr/bin/npm. nvm installs differ.
+ExecStart=/usr/bin/npm run start
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
